@@ -56,7 +56,7 @@ const getOneRecipe = async (index) => {
 const getAllRecipeNames = async () => {
   const data = await fs.readFile("./recipes-data.json", "utf-8");
   //convert it to JavaScript : We need to parse the JSON object into JavaScript
-  //Declare a variable named parsedBooks and store the parsed data in it converted using the JSON.parse method
+  //Declare a variable named recipes and store the parsed data in it converted using the JSON.parse method
   const recipes = JSON.parse(data);
   //Get names from recipes
   //Declare an empty array called "names"
