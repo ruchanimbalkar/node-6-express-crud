@@ -41,24 +41,28 @@ const getAllBooks = async () => {
   //convert it to JavaScript : We need to parse the JSON object into JavaScript
   //Declare a variable named parsedBooks and store the parsed data in it converted using the JSON.parse method
   const parsedBooks = JSON.parse(data);
-  //respond.send() sends text/string data in response
-  //respond.json() sends JSON data in response
+  //return parsedBooks
   return parsedBooks;
 };
 // 2. getOneBook(index)
 const getOneBook = async (index) => {
-  //We want to read data from the books-data.json file
-  //The fs.readFile() method takes in 2 parameters:
-  // 1. The file path to the file we want to read from
-  // 2. The encoding
-  //data is still in JSON format
+  //Read the books data from the books-data.json file
   const data = await fs.readFile("./books-data.json", "utf-8");
-  //convert it to JavaScript : We need to parse the JSON object into JavaScript
+  //parse the books data : We need to parse the JSON object into JavaScript format
   //Declare a variable named parsedBooks and store the parsed data in it converted using the JSON.parse method
   const parsedBooks = JSON.parse(data);
-  //respond.send() sends text/string data in response
-  //respond.json() sends JSON data in response
+  // return the book at the index in parsedBooks
   return parsedBooks[index];
+};
+
+const getOneBookTitle = async (index) => {
+  //Read the books data from the books-data.json file
+  const data = await fs.readFile("./books-data.json", "utf-8");
+  //parse the books data : We need to parse the JSON object into JavaScript format
+  //Declare a variable named parsedBooks and store the parsed data in it converted using the JSON.parse method
+  const parsedBooks = JSON.parse(data);
+  // return the book title at the index in parsedBooks
+  return parsedBooks[index].title;
 };
 
 // ---------------------------------
@@ -67,13 +71,28 @@ const getOneBook = async (index) => {
 
 // 1. GET /get-all-books
 app.get("/get-all-books", async (request, respond) => {
+  //call the helper function and save its return value in a variable called "allBooks"
   const allBooks = await getAllBooks();
+  //send all books as JSON data in the response
   respond.json(allBooks);
 });
 
 // 2. GET /get-one-book/:index
 app.get("/get-one-book/:index", async (request, respond) => {
+  //get the value of the index dynamic parameter
   let index = request.params.index;
+  //call the helper function that gets the book from the file
   let book = await getOneBook(index);
+  //send the book as JSON data in the response
   respond.json(book);
+});
+
+//3. GET /get-one-book-title/:index
+app.get("/get-one-title/:index", async (request, respond) => {
+  //get the value of the index dynamic parameter
+  let index = request.params.index;
+  //call the helper function that gets the book from the file
+  let title = await getOneBookTitle(index);
+  //send the title as JSON data in the response
+  respond.json(title);
 });
