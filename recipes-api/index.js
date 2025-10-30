@@ -117,5 +117,5 @@ app.get("/get-recipes-count", async (request, respond) => {
   //call the helper function and save its return value in a variable called "count"
   let count = await getRecipesCount();
   //send count as JSON data in the response
-  respond.json(count);
+  respond.json({ count: count }); //Most APIs expect JSON data
 });
