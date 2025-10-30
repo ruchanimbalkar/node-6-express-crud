@@ -72,7 +72,7 @@ const getAllRecipeNames = async () => {
 const getRecipesCount = async () => {
   const data = await fs.readFile("./recipes-data.json", "utf-8");
   //convert it to JavaScript : We need to parse the JSON object into JavaScript
-  //Declare a variable named parsedBooks and store the parsed data in it converted using the JSON.parse method
+  //Declare a variable named recipes and store the parsed data in it converted using the JSON.parse method
   const recipes = JSON.parse(data);
   // return length of recipes (#number/count)
   return recipes.length;
