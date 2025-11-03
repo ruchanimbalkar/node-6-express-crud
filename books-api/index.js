@@ -6,13 +6,13 @@
 import express from "express"; // the framework that lets us build webservers
 import fs from "fs/promises"; // the file system module lets us read and write data from files
 
-//Declare a variable named app and call the express() function to create a new instance of express so we can use all of the methods, fucntions, properties of express
+//Declare a variable named app and call the express() function to create a new instance of express so we can use all of the methods, functions, properties of express
 // which will be saved in app
 const app = express();
 
-//Defining out port number
+//Defining our port number
 //What port should our server listen to?
-const port = 3000; // you can use any port # but developers commonly use 3000 while they are still in development process or testing. Also there are some port numbers you cannot use
+const port = 3000; // you can use any port # but developers commonly use 3000 while they are still in development process or testing. Also there are some port numbers you cannot use.
 
 //Declaring that this server will be receiving and responding to requests in JSON
 app.use(express.json()); //To tell Express that our server will be receiving data in JSON format and sending data in JSON format
@@ -25,13 +25,11 @@ app.listen(port, () => {
 
 //We will create the beginnings of a CRUD application
 //CRUD stands for CREATE READ UPDATE DELETE
-//We are only g
+//We are only getting getting data [GET requests], so we will use READ application at this time
 // ---------------------------------
 // Helper Functions
 // ---------------------------------
-
-// 1. getAllBooks()
-const getAllBooks = async () => {
+const readBookData = async () => {
   //We want to read data from the books-data.json file
   //The fs.readFile() method takes in 2 parameters:
   // 1. The file path to the file we want to read from
@@ -44,25 +42,39 @@ const getAllBooks = async () => {
   //return parsedBooks
   return parsedBooks;
 };
+
+// 1. getAllBooks()
+const getAllBooks = async () => {
+  //Declare a variable named books and store the value readBookData() returns in it
+  const books = await readBookData();
+  //return parsedBooks
+  return books;
+};
 // 2. getOneBook(index)
 const getOneBook = async (index) => {
-  //Read the books data from the books-data.json file
-  const data = await fs.readFile("./books-data.json", "utf-8");
-  //parse the books data : We need to parse the JSON object into JavaScript format
-  //Declare a variable named parsedBooks and store the parsed data in it converted using the JSON.parse method
-  const parsedBooks = JSON.parse(data);
-  // return the book at the index in parsedBooks
-  return parsedBooks[index];
+  //Declare a variable named books and store the value readBookData() returns in it
+  const books = await readBookData();
+  //if index is not a valid number, if index greater than lenght of books arrray
+  if (index >= books.length) {
+    //return error message
+    return "Book not found! Status Code 500";
+  } else {
+    // return the book at the index in books
+    return books[index];
+  }
 };
 
 const getOneBookTitle = async (index) => {
-  //Read the books data from the books-data.json file
-  const data = await fs.readFile("./books-data.json", "utf-8");
-  //parse the books data : We need to parse the JSON object into JavaScript format
-  //Declare a variable named parsedBooks and store the parsed data in it converted using the JSON.parse method
-  const parsedBooks = JSON.parse(data);
-  // return the book title at the index in parsedBooks
-  return parsedBooks[index].title;
+  //Declare a variable named books and store the value readBookData() returns in it
+  const books = await readBookData();
+  //if index is not a valid number, if index greater than lenght of books arrray
+  if (index >= books.length) {
+    //return error message
+    return "Book title not found! Status Code 500";
+  } else {
+    // return the book title at the index in parsedBooks
+    return books[index].title;
+  }
 };
 
 // ---------------------------------
@@ -82,9 +94,13 @@ app.get("/get-one-book/:index", async (request, respond) => {
   //get the value of the index dynamic parameter
   let index = request.params.index;
   //call the helper function that gets the book from the file
-  let book = await getOneBook(index);
-  //send the book as JSON data in the response
-  respond.json(book);
+  let result = await getOneBook(index);
+  if (typeof result === Object) {
+    //send the book as JSON data in the response
+    respond.json(result);
+  } else {
+    respond.send(result);
+  }
 });
 
 //3. GET /get-one-book-title/:index
@@ -92,7 +108,13 @@ app.get("/get-one-title/:index", async (request, respond) => {
   //get the value of the index dynamic parameter
   let index = request.params.index;
   //call the helper function that gets the book from the file
-  let title = await getOneBookTitle(index);
-  //send the title as JSON data in the response
-  respond.json(title);
+  let result = await getOneBookTitle(index);
+  if (typeof result === Object) {
+    //alternative 1 send the title as text data in the response
+    //respond.send(bookTitle);
+    // or alternative 2 : send the response as a valid JSON object
+    respond.json({ title: result }); //Most APIs expect JSON data
+  } else {
+    respond.send(result);
+  }
 });
