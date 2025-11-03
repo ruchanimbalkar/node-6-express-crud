@@ -28,6 +28,7 @@ app.listen(port, () => {
 // Helper Functions
 // ---------------------------------
 
+//Write a function that reads recipes data
 const readRecipesData = async () => {
   //Read the data from the recipes-data.json file
   const data = await fs.readFile("./recipes-data.json", "utf-8");
