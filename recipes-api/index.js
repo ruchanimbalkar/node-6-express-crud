@@ -5,6 +5,7 @@
 //Importing all of our node modules
 import express from "express"; // the framework that lets us build webservers
 import fs from "fs/promises"; // the file system module lets us read and write data from files
+import { parse } from "path";
 
 //Declare a variable named app and call the express() function to create a new instance of express so we can use all of the methods, fucntions, properties of express
 // which will be saved in app
@@ -27,15 +28,22 @@ app.listen(port, () => {
 // Helper Functions
 // ---------------------------------
 
-// 1. getAllRecipes()
-
-const getAllRecipes = async () => {
-  //Read the books data from the recipes-data.json file
+const readRecipesData = async () => {
+  //Read the data from the recipes-data.json file
   const data = await fs.readFile("./recipes-data.json", "utf-8");
   console.log("data", data);
   //convert it to JavaScript : We need to parse the JSON object into JavaScript
-  //Declare a variable named recipes and store the parsed data in it converted using the JSON.parse method
-  const recipes = JSON.parse(data);
+  //Declare a variable named parsedData and store the parsed data in it converted using the JSON.parse method
+  const parsedData = JSON.parse(data);
+  //return recipes
+  return parsedData;
+};
+
+// 1. getAllRecipes()
+
+const getAllRecipes = async () => {
+  //Declare a variable named recipes and store the value returned by the readRecipesData() function
+  const recipes = await readRecipesData();
   //return recipes
   return recipes;
 };
@@ -43,24 +51,20 @@ const getAllRecipes = async () => {
 // 2. getOneRecipe(index)
 
 const getOneRecipe = async (index) => {
-  //Read the books data from the recipes-data.json file
-  const data = await fs.readFile("./recipes-data.json", "utf-8");
-  console.log("data", data);
-  //convert it to JavaScript : We need to parse the JSON object into JavaScript
-  //Declare a variable named recipes and store the parsed data in it converted using the JSON.parse method
-  const recipes = JSON.parse(data);
-  console.log(recipes);
-  //return recipe at that index using index
-  return recipes[index];
+  //Declare a variable named recipes and store the value returned by the readRecipesData() function
+  const recipes = await readRecipesData();
+  if (index >= recipes.length) {
+    return "Recipe not found, Status Code 500";
+  } else {
+    //return recipe at that index using index
+    return recipes[index];
+  }
 };
 
 // 3. getAllRecipeNames()
 const getAllRecipeNames = async () => {
-  //Read the recipes data from the recipes-data.json file
-  const data = await fs.readFile("./recipes-data.json", "utf-8");
-  //convert it to JavaScript : We need to parse the JSON object into JavaScript
-  //Declare a variable named recipes and store the parsed data in it converted using the JSON.parse method
-  const recipes = JSON.parse(data);
+  //Declare a variable named recipes and store the value returned by the readRecipesData() function
+  const recipes = await readRecipesData();
   //Get names from recipes
   //Declare an empty array called "names"
   let names = [];
@@ -73,11 +77,8 @@ const getAllRecipeNames = async () => {
 // 4. getRecipesCount()
 
 const getRecipesCount = async () => {
-  //Read the recipes data from the recipes-data.json file
-  const data = await fs.readFile("./recipes-data.json", "utf-8");
-  //convert it to JavaScript : We need to parse the JSON object into JavaScript
-  //Declare a variable named recipes and store the parsed data in it converted using the JSON.parse method
-  const recipes = JSON.parse(data);
+  //Declare a variable named recipes and store the value returned by the readRecipesData() function
+  const recipes = await readRecipesData();
   // return length of recipes (#number/count)
   return recipes.length;
 };
@@ -99,9 +100,13 @@ app.get("/get-all-recipes", async (request, respond) => {
 app.get("/get-one-recipe/:index", async (request, respond) => {
   let index = request.params.index;
   //call the helper function and save its return value in a variable called "recipe"
-  let recipe = await getOneRecipe(index);
-  //send one recipe as JSON data in the response
-  respond.json(recipe);
+  let result = await getOneRecipe(index);
+  if (typeof result === String) {
+    respond.send(result);
+  } else {
+    //send one recipe as JSON data in the response
+    respond.json(result);
+  }
 });
 
 // 3. GET /get-all-recipe-names
