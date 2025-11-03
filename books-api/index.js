@@ -35,8 +35,8 @@ const readBookData = async () => {
   // 1. The file path to the file we want to read from
   // 2. The encoding
   //data is still in JSON format
-  const data = await fs.readFile("./books-data.json", "utf-8");
-  //convert it to JavaScript : We need to parse the JSON object into JavaScript
+  const data = await fs.readFile("./books-data.json", "utf8");
+  //convert it to JavaScript : We need to parse the JSON object and turn it into JavaScript format
   //Declare a variable named parsedBooks and store the parsed data in it converted using the JSON.parse method
   const parsedBooks = JSON.parse(data);
   //return parsedBooks
@@ -75,6 +75,31 @@ const getOneBookTitle = async (index) => {
     // return the book title at the index in parsedBooks
     return books[index].title;
   }
+};
+
+const updateOneBookTitle = async (index, newBookTitle) => {
+  //read book data using the helper function readBookData (we get parsedData from the file) books contains JavaScript data
+  let books = await readBookData();
+  //find the book at specified index and update its title
+  const bookToUpdate = books[index];
+  console.log(bookToUpdate);
+
+  //update the title of the book
+  books[index].title = newBookTitle;
+
+  //stringify the books data back into JSON
+  const stringifiedBooks = JSON.stringify(books);
+
+  //write the new data to the file
+  fs.writeFile("./books-data.json", stringifiedBooks, "utf-8", (err) => {
+    if (err) {
+      console.error("Error writing file:", err);
+      return;
+    }
+    console.log("File written successfully!");
+  });
+
+  //Reference : https://www.geeksforgeeks.org/node-js/node-js-fs-writefile-method/
 };
 
 // ---------------------------------
@@ -118,3 +143,21 @@ app.get("/get-one-title/:index", async (request, respond) => {
     respond.send(result);
   }
 });
+
+//4. POST /update-one-book-title/:index/:newBookTitle
+//Change/update book title at index
+app.post(
+  "/update-one-book-title/:index/:newBookTitle",
+  async (request, respond) => {
+    //Get values of the parameters
+    let index = request.params.index;
+    let newBookTitle = request.params.newBookTitle;
+    //call the helper function
+    await updateOneBookTitle(index, newBookTitle); // this function will read and write in our data file
+
+    //We are using respond.send() because we are sending text/string data.
+    respond.send(
+      `Book title at index ${index} was successfully updated to new book title ${newBookTitle}`
+    );
+  }
+);
