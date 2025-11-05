@@ -51,12 +51,16 @@ const getAllRecipes = async () => {
 
 // 2. getOneRecipe(index)
 
+//getPneREcipe() is an async arrow function for /get-one-recipe endpoint
 const getOneRecipe = async (index) => {
   //Declare a variable named recipes and store the value returned by the readRecipesData() function
   const recipes = await readRecipesData();
+  //check if index is valid, i.e. if it is length or greater than length
   if (index >= recipes.length) {
+    //return message : "Recipe not found, Status Code 500"
     return "Recipe not found, Status Code 500";
   } else {
+    //otherwise
     //return recipe at that index using index
     return recipes[index];
   }
@@ -99,12 +103,16 @@ app.get("/get-all-recipes", async (request, respond) => {
 
 // 2. GET /get-one-recipe/:index
 app.get("/get-one-recipe/:index", async (request, respond) => {
+  //Declare a variable named index and save the value of index from the dynamic url using request.params
   let index = request.params.index;
-  //call the helper function and save its return value in a variable called "recipe"
+  //call the helper function and save its return value in a variable called "result"
   let result = await getOneRecipe(index);
+  //if typeof result is string, it is a message
   if (typeof result === String) {
+    //Send text in response using response.send()
     respond.send(result);
   } else {
+    //otherwise the resut contains the recipe
     //send one recipe as JSON data in the response
     respond.json(result);
   }
