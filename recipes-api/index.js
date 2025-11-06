@@ -51,7 +51,7 @@ const getAllRecipes = async () => {
 
 // 2. getOneRecipe(index)
 
-//getOneRcipe() is an async arrow function for /get-one-recipe endpoint
+//getOneRecipe() is an async arrow function for /get-one-recipe endpoint
 const getOneRecipe = async (index) => {
   //Declare a variable named recipes and store the value returned by the readRecipesData() function
   const recipes = await readRecipesData();
